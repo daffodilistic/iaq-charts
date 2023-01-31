@@ -18,6 +18,11 @@ class ComposerStaticInit439438540d5ed4cc7cd0daaebfab906c
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Slim\\Psr7\\' => 10,
             'Slim\\' => 5,
+            'Selective\\BasePath\\' => 19,
+        ),
+        'R' => 
+        array (
+            'RedBeanPHP\\' => 11,
         ),
         'P' => 
         array (
@@ -45,6 +50,14 @@ class ComposerStaticInit439438540d5ed4cc7cd0daaebfab906c
         'Slim\\' => 
         array (
             0 => __DIR__ . '/..' . '/slim/slim/Slim',
+        ),
+        'Selective\\BasePath\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/selective/basepath/src',
+        ),
+        'RedBeanPHP\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/gabordemooij/redbean/RedBeanPHP',
         ),
         'Psr\\Log\\' => 
         array (

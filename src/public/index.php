@@ -3,13 +3,18 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Selective\BasePath\BasePathMiddleware;
+use RedBeanPHP\R;
 
 require __DIR__ . '/../vendor/autoload.php';
+
+R::setup('mysql:host=mysql;dbname=iaq-charts', 'iaq', 'iaq' );
 
 $app = AppFactory::create();
 
 // Add Slim routing middleware
 $app->addRoutingMiddleware();
+// Parse json, form data and xml
+$app->addBodyParsingMiddleware();
 
 // Set the base path to run the app in a subdirectory.
 // This path is used in urlFor().
@@ -17,8 +22,39 @@ $app->add(new BasePathMiddleware($app));
 
 $app->addErrorMiddleware(true, true, true);
 
-$app->get('/', function (Request $request, Response $response, $args) {
-    $response->getBody()->write("Hello world!");
+$app->get('/', function (Request $request, Response $response, array $args) {
+    $response->getBody()->write("OK!");
+    return $response;
+});
+
+$app->post('/upload', function (Request $request, Response $response, array $args) {
+    $data = $request->getParsedBody();
+    // $html = var_export($data, true);
+
+    // $STDERR = fopen('php://stdout', 'wb');
+    // fwrite($STDERR, json_encode($data[0], JSON_PRETTY_PRINT));
+    // fclose($STDERR);
+
+    foreach ($data as $record) {
+        $readings = R::dispense( 'readings' );
+
+        foreach ($record as $key => $value) {
+            if ($key != "") {
+                $prop = strtolower($key);
+                $prop = str_replace(' ', '_', $prop);
+
+                if ($prop == "timestamp") {
+                    $date = DateTimeImmutable::createFromFormat("d/m/y H:i", $value);
+                    $value = DateTime::createFromImmutable($date);
+                }
+                $readings->$prop = $value;
+            }
+        }
+        
+        R::store( $readings );
+    }
+
+    $response->getBody()->write("DONE!");
     return $response;
 });
 

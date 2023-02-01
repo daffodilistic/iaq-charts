@@ -27,6 +27,19 @@ $app->get('/', function (Request $request, Response $response, array $args) {
     return $response;
 });
 
+$app->get('/readings', function (Request $request, Response $response, array $args) {
+    // Query DB for readings by date range
+    // This is assuming that the dates are in the correct format (e.g. '31/01/2021')
+    $query_data = $request->getQueryParams();
+    $start = $query_data['start'];
+    $end = $query_data['end'];
+    $readings = R::find('readings', 'timestamp >= ? AND timestamp <= ?', [$start, $end]);
+
+    $response->getBody()->write(json_encode($readings));
+    $response = $response->withHeader('Content-type', 'application/json');
+    return $response;
+});
+
 $app->post('/upload', function (Request $request, Response $response, array $args) {
     $data = $request->getParsedBody();
     // $html = var_export($data, true);
@@ -50,7 +63,7 @@ $app->post('/upload', function (Request $request, Response $response, array $arg
                 $readings->$prop = $value;
             }
         }
-        
+
         R::store( $readings );
     }
 

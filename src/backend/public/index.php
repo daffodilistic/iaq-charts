@@ -46,7 +46,7 @@ $app->get('/readings', function (Request $request, Response $response, array $ar
     $end = $query_data['end'];
     $readings = R::find('readings', 'timestamp >= ? AND timestamp <= ?', [$start, $end]);
 
-    $response->getBody()->write(json_encode($readings));
+    $response->getBody()->write(json_encode(R::exportAll($readings)));
     $response = $response->withHeader('Content-type', 'application/json');
     return $response;
 });

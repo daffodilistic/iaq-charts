@@ -4,6 +4,8 @@ import VueApexCharts from "vue3-apexcharts";
 // import * as Vue from 'vue' // in Vue 3
 import axios from 'axios';
 import VueAxios from 'vue-axios';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
 
 import './assets/main.css';
 

@@ -8,6 +8,7 @@
 </script>
 
 <script>
+const API_URL = '//localhost:3000/readings';
 export default {
   name: 'HelloWorld',
   data() {
@@ -28,8 +29,7 @@ export default {
   },
   mounted() {
     console.log(`the component is now mounted.`);
-    let url = 'http://localhost:3000/readings?start=2022-10-10&end=2022-10-17';
-    this.axios.get(url).then((response) => {
+    this.axios.get(API_URL, { params: { start: '2022-10-10', end: '2022-10-17' }}).then((response) => {
       // console.log(response.data)
       this.series = [{
         data: response.data.map((reading) => {
@@ -43,7 +43,22 @@ export default {
 
 <template>
   <div class="greetings">
-    <apexchart width="1024" type="line" :options="options" :series="series"></apexchart>
+    <div>
+      <apexchart width="1024" type="line" :options="options" :series="series"></apexchart>
+    </div>
+    <div class="container text-center">
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-primary">1 Week</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-primary">1 Month</button>
+          </div>
+          <div class="col">
+            <button type="button" class="btn btn-primary">All Data</button>
+          </div>
+        </div>
+    </div>
   </div>
 </template>
 

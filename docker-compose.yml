@@ -20,7 +20,7 @@ services:
         image: 'nginx:alpine'
         working_dir: /app
         volumes:
-            - './src:/app'
+            - './src/backend:/app'
             - './phpdocker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf'
         ports:
             - '3000:80'
@@ -29,5 +29,5 @@ services:
         build: phpdocker/php-fpm
         working_dir: /app
         volumes:
-            - './src:/app'
+            - './src/backend:/app'
             - './phpdocker/php-fpm/php-ini-overrides.ini:/etc/php/8.2/fpm/conf.d/99-overrides.ini'

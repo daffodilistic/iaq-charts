@@ -4,6 +4,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Selective\BasePath\BasePathMiddleware;
 use RedBeanPHP\R;
+use Slim\Exception\HttpNotFoundException;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -11,16 +12,26 @@ R::setup('mysql:host=mysql;dbname=iaq-charts', 'iaq', 'iaq' );
 
 $app = AppFactory::create();
 
+// Set the base path to run the app in a subdirectory.
+// This path is used in urlFor().
+$app->add(new BasePathMiddleware($app));
 // Add Slim routing middleware
 $app->addRoutingMiddleware();
 // Parse json, form data and xml
 $app->addBodyParsingMiddleware();
-
-// Set the base path to run the app in a subdirectory.
-// This path is used in urlFor().
-$app->add(new BasePathMiddleware($app));
-
 $app->addErrorMiddleware(true, true, true);
+
+// CORS suppport
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+    return $response;
+});
+$app->add(function ($request, $handler) {
+    $response = $handler->handle($request);
+    return $response
+            ->withHeader('Access-Control-Allow-Origin', '*')
+            ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+});
 
 $app->get('/', function (Request $request, Response $response, array $args) {
     $response->getBody()->write("OK!");
@@ -40,7 +51,7 @@ $app->get('/readings', function (Request $request, Response $response, array $ar
     return $response;
 });
 
-$app->post('/upload', function (Request $request, Response $response, array $args) {
+$app->post('/api/upload', function (Request $request, Response $response, array $args) {
     $data = $request->getParsedBody();
     // $html = var_export($data, true);
 
@@ -69,6 +80,14 @@ $app->post('/upload', function (Request $request, Response $response, array $arg
 
     $response->getBody()->write("DONE!");
     return $response;
+});
+
+/**
+ * Catch-all route to serve a 404 Not Found page if none of the routes match
+ * NOTE: make sure this route is defined last
+ */
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($request, $response) {
+    throw new HttpNotFoundException($request);
 });
 
 $app->run();

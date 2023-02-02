@@ -17,12 +17,12 @@ export default {
           id: 'vuechart-example'
         },
         xaxis: {
-          categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+          type: 'datetime'
         }
       },
       series: [{
-        name: 'series-1',
-        data: [30, 40, 45, 50, 49, 60, 70, 91]
+        name: 'Temperature',
+        data: []
       }]
     }
   },
@@ -30,8 +30,13 @@ export default {
     console.log(`the component is now mounted.`);
     let url = 'http://localhost:3000/readings?start=2022-10-10&end=2022-10-17';
     this.axios.get(url).then((response) => {
-        console.log(response.data)
-      });
+      // console.log(response.data)
+      this.series = [{
+        data: response.data.map((reading) => {
+          return [reading.timestamp, reading.temperature]
+        })
+      }];
+    });
   }
 }
 </script>

@@ -18,7 +18,12 @@ export default {
           id: 'vuechart-example'
         },
         xaxis: {
-          type: 'datetime'
+          type: 'datetime',
+          tooltip: {
+            formatter: function(val, opts) {
+              return new Date(val).toLocaleString();
+            }
+          }
         }
       },
       series: [{
@@ -37,6 +42,26 @@ export default {
         })
       }];
     });
+  },
+  methods: {
+    getRandomData(days) {
+      // Data starts from 2022-10-01 to 2022-11-01
+      let start = new Date('2022-10-01');
+      let end = new Date('2022-11-01');
+      if (days > 0) {
+        end = new Date(start.getTime());
+        end.setDate(end.getDate() + days);
+        // console.log(end);
+      }
+      this.axios.get(API_URL, { params: { start: start.toISOString().split('T')[0], end: end.toISOString().split('T')[0] }}).then((response) => {
+        // console.log(response.data)
+        this.series = [{
+          data: response.data.map((reading) => {
+            return [reading.timestamp, reading.temperature]
+          })
+        }];
+      });
+    }
   }
 }
 </script>
@@ -49,13 +74,13 @@ export default {
     <div class="container text-center">
         <div class="row">
           <div class="col">
-            <button type="button" class="btn btn-primary">1 Week</button>
+            <button type="button" class="btn btn-primary" @click="getRandomData(1)">1 Day</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-primary">1 Month</button>
+            <button type="button" class="btn btn-primary" @click="getRandomData(7)">1 Week</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-primary">All Data</button>
+            <button type="button" class="btn btn-primary" @click="getRandomData(-1)">All Data</button>
           </div>
         </div>
     </div>
